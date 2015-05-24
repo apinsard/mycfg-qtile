@@ -126,6 +126,6 @@ follow_mouse_focus = True
 bring_front_click = False
 cursor_wrap = False
 floating_layout = layout.Floating()
-auto_fullscreen=True
+auto_fullscreen = True
 
 wmname = 'Qtile (Python %s)' % python_version()
