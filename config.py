@@ -15,8 +15,6 @@ shift = 'shift'
 terminal = 'urxvt'
 editor = os.getenv('EDITOR', 'nano')
 editor_cmd = '%s -e %s' % (terminal, editor)
-hostname = os.uname()[1]
-
 
 keys = [
     # Switch between windows in current stack pane
@@ -100,7 +98,6 @@ screens = [
             [
                 widget.Clock(format='%b %-d, %a %H:%M'),
                 widget.Sep(),
-                widget.Prompt(),
                 widget.WindowName(),
             ],
             24,
