@@ -6,7 +6,6 @@ from libqtile import layout, bar, widget
 from libqtile.command import lazy
 from libqtile.config import Key, Screen, Group, Drag, Click
 
-
 alt = 'mod1'
 mod = 'mod4'
 ctrl = 'control'
@@ -15,6 +14,7 @@ shift = 'shift'
 terminal = 'urxvt'
 editor = os.getenv('EDITOR', 'nano')
 editor_cmd = '%s -e %s' % (terminal, editor)
+webbrowser = 'firefox'
 
 keys = [
     # Switch between windows in current stack pane
@@ -39,6 +39,10 @@ keys = [
     Key([alt, shift], 'Tab',
         lazy.layout.rotate()),
 
+    # Switch active screen
+    Key([mod], 'Tab',
+        lazy.next_screen()),
+
     # Switch layouts
     Key([mod], 'space',
         lazy.next_layout()),
@@ -60,14 +64,16 @@ keys = [
         lazy.spawn(terminal)),
 ]
 
-groups = [Group(i) for i in "12345"]
+autostart = {'1': terminal, '2': webbrowser}
+groups = [Group(i, spawn=autostart.get(i)) for i in "12345"]
 
 for i in range(len(groups)):
     grp = groups[i].name
-    keys.append(Key([mod], 'F%d' % (i+1),
-                lazy.group[grp].toscreen()))
-    keys.append(Key([mod, shift], 'F%d' % (i+1),
-                lazy.window.togroup(grp)))
+    key = 'F%d' % (i+1)
+    keys.append(Key([mod], key,
+                    lazy.group[grp].toscreen()))
+    keys.append(Key([mod, shift], key,
+                    lazy.window.togroup(grp)))
 
 layouts = [
     layout.Max(),
@@ -75,7 +81,7 @@ layouts = [
 ]
 
 widget_defaults = dict(
-    font='Arial',
+    font='Inconsolata',
     fontsize=12,
     padding=2,
 )
