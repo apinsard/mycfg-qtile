@@ -1,9 +1,11 @@
+import logging
 import os
+import subprocess
 
 from platform import python_version
 
-from libqtile import layout, bar, widget
-from libqtile.command import lazy
+from libqtile import layout, bar, widget, hook
+from libqtile.command import lazy, Client
 from libqtile.config import Key, Screen, Group, Drag, Click
 
 alt = 'mod1'
@@ -15,6 +17,8 @@ terminal = 'urxvt'
 editor = os.getenv('EDITOR', 'nano')
 editor_cmd = '%s -e %s' % (terminal, editor)
 webbrowser = 'firefox'
+
+logger = logging.getLogger('qtile')
 
 keys = [
     # Switch between windows in current stack pane
@@ -132,3 +136,7 @@ floating_layout = layout.Floating()
 auto_fullscreen = True
 
 wmname = 'Qtile (Python %s)' % python_version()
+
+@hook.subscribe.current_screen_change
+def highlight_screen():
+    subprocess.call('/home/antoine/.config/qtile/highlight_screen.py')
