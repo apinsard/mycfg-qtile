@@ -139,4 +139,5 @@ wmname = 'Qtile (Python %s)' % python_version()
 
 @hook.subscribe.current_screen_change
 def highlight_screen():
-    subprocess.call('/home/antoine/.config/qtile/highlight_screen.py')
+    pass
+    #subprocess.call('/home/antoine/.config/qtile/highlight_screen.py')
