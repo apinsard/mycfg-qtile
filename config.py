@@ -44,7 +44,7 @@ keys = [
         lazy.layout.rotate()),
 
     # Switch active screen
-    Key([mod], 'Tab',
+    Key([mod], 'n',
         lazy.next_screen()),
 
     # Switch layouts
