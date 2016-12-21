@@ -1,11 +1,9 @@
-import logging
 import os
-import subprocess
 
 from platform import python_version
 
-from libqtile import layout, bar, widget, hook
-from libqtile.command import lazy, Client
+from libqtile import layout, bar, widget
+from libqtile.command import lazy
 from libqtile.config import Key, Screen, Group, Drag, Click
 
 alt = 'mod1'
@@ -14,11 +12,14 @@ ctrl = 'control'
 shift = 'shift'
 
 terminal = 'urxvt'
-editor = os.getenv('EDITOR', 'nano')
-editor_cmd = '%s -e %s' % (terminal, editor)
+editor = os.getenv('EDITOR', 'vi')
+editor_cmd = '{term} -e {ed}'.format(term=terminal, ed=editor)
 webbrowser = 'firefox'
-
-logger = logging.getLogger('qtile')
+mail = (
+    '{term} -e tmux -2 new -s mail '
+    'tmux source-file /home/tony/.config/tmux/mail-session.conf'
+).format(term=terminal)
+new_term = '{term} -e tmux -2'.format(term=terminal)
 
 keys = [
     # Switch between windows in current stack pane
@@ -65,15 +66,18 @@ keys = [
 
     # Apps shortcuts
     Key([mod], 'Return',
-        lazy.spawn(terminal)),
+        lazy.spawn(new_term)),
+    Key([], 'XF86Mail',
+        lazy.spawn(mail)),
+
 ]
 
-autostart = {'1': terminal, '2': webbrowser}
-groups = [Group(i, spawn=autostart.get(i)) for i in "12345"]
+autostart = {'term': new_term, 'net': webbrowser}
+groups = [Group(i, spawn=autostart.get(i)) for i in ['term', 'net', 'mail']]
 
-for i in range(len(groups)):
-    grp = groups[i].name
-    key = 'F%d' % (i+1)
+for i, group in enumerate(groups, 1):
+    grp = group.name
+    key = 'F%d' % i
     keys.append(Key([mod], key,
                     lazy.group[grp].toscreen()))
     keys.append(Key([mod, shift], key,
@@ -81,7 +85,7 @@ for i in range(len(groups)):
 
 layouts = [
     layout.Max(),
-    layout.Stack(num_stacks=2)
+    layout.Matrix(margin=20),
 ]
 
 widget_defaults = dict(
@@ -94,9 +98,9 @@ screens = [
     Screen(
         top=bar.Bar(
             [
-                widget.GroupBox(),
+                widget.GroupBox(highlight_method='text'),
                 widget.Prompt(),
-                widget.WindowName(),
+                widget.Spacer(),
                 widget.TextBox("Vol."),
                 widget.Volume(),
             ],
@@ -107,13 +111,16 @@ screens = [
         top=bar.Bar(
             [
                 widget.Clock(format='%b %-d, %a %H:%M'),
-                widget.Sep(),
-                widget.WindowName(),
+                widget.Spacer(),
+                widget.MemoryGraph(frequency=10),
+                widget.CPUGraph(frequency=10),
+                widget.ThermalSensor(update_interval=60, threshold=60),
             ],
             24,
         ),
     ),
 ]
+screens.reverse()  # I don't know why screens are not in the right order
 
 mouse = [
     Drag([mod], 'Button1',
@@ -136,8 +143,3 @@ floating_layout = layout.Floating()
 auto_fullscreen = True
 
 wmname = 'Qtile (Python %s)' % python_version()
-
-@hook.subscribe.current_screen_change
-def highlight_screen():
-    pass
-    #subprocess.call('/home/antoine/.config/qtile/highlight_screen.py')
